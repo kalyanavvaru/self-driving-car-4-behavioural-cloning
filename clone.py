@@ -17,15 +17,15 @@ def generator(samples, batch_size):
             angles = []
             for batch_sample in batch_samples:
                 name = './data/IMG/'+batch_sample[0].split('/')[-1]
-                center_image = cv2.imread(name)                
+                center_image = cv2.cvtColor(cv2.imread(name), cv2.COLOR_BGR2RGB)
                 images.append(center_image)
                 
                 left_name = './data/IMG/'+batch_sample[1].split('/')[-1]
-                left_image = cv2.imread(left_name)                
+                left_image = cv2.cvtColor(cv2.imread(left_name), cv2.COLOR_BGR2RGB)             
                 images.append(left_image)
                 
                 right_name = './data/IMG/'+batch_sample[2].split('/')[-1]
-                right_image = cv2.imread(right_name)                
+                right_image = cv2.cvtColor(cv2.imread(right_name), cv2.COLOR_BGR2RGB)                
                 images.append(right_image)
                 
                 center_angle = float(batch_sample[3])
@@ -38,10 +38,10 @@ def generator(samples, batch_size):
                 angles.append(center_angle*-1.0)
                 
                 images.append(cv2.flip(left_image,1))
-                angles.append((center_angle*-1.0))
+                angles.append((center_angle*-1.0) + 0.4)
                 
                 images.append(cv2.flip(right_image,1))
-                angles.append((center_angle*-1.0))
+                angles.append((center_angle*-1.0) - 0.4)
                 
                 
             # trim image to only see section with road
@@ -77,16 +77,9 @@ from keras import backend as K
 from math import ceil
 from keras.layers.convolutional import Convolution2D
 
-row, col, ch = 160, 320, 3 # Trimmed image format
-# model = Sequential()
-
-
 model = Sequential()
-# Preprocess incoming data, centered around zero with small standard deviation 
-# model.add(Lambda(lambda x: ((x/3)-127.5)/127.5, input_shape=(row, col, ch)))
-model.add(Lambda(lambda x: ((x)-128)/128, input_shape=(row, col, ch)))
+model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape = (160, 320, 3)))
 model.add(Cropping2D(cropping=((60,25), (0,0))))
-
 model.add(Conv2D(24, (5, 5), activation="relu", strides=(2, 2)))
 model.add(Conv2D(36, (5, 5), activation="relu", strides=(2, 2)))
 model.add(Conv2D(48, (3, 3), activation="relu", strides=(2, 2)))
@@ -94,7 +87,7 @@ model.add(Conv2D(64, (3, 3), activation="relu", strides=(2, 2)))
 model.add(Conv2D(64, (3, 3), activation="relu", strides=(2, 2)))
 model.add(Dropout(0.3))
 model.add(Flatten())
-model.add(Dense(100, activation="relu"))
+model.add(Dense(125, activation="relu"))
 model.add(Dropout(0.3))
 model.add(Dense(50,activation="relu"))  
 model.add(Dropout(0.3))
