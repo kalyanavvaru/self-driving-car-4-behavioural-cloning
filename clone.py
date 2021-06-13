@@ -30,18 +30,18 @@ def generator(samples, batch_size):
                 
                 center_angle = float(batch_sample[3])
                 angles.append(center_angle)
-                angles.append(center_angle+0.2)
-                angles.append(center_angle-0.2)
+                angles.append(center_angle+0.4)
+                angles.append(center_angle-0.4)
                 
                 # Flipping
                 images.append(cv2.flip(center_image,1))
                 angles.append(center_angle*-1.0)
                 
                 images.append(cv2.flip(left_image,1))
-                angles.append((center_angle*-1.0) + 0.2)
+                angles.append((center_angle*-1.0))
                 
                 images.append(cv2.flip(right_image,1))
-                angles.append((center_angle*-1.0) - 0.2)
+                angles.append((center_angle*-1.0))
                 
                 
             # trim image to only see section with road
@@ -84,7 +84,7 @@ row, col, ch = 160, 320, 3 # Trimmed image format
 model = Sequential()
 # Preprocess incoming data, centered around zero with small standard deviation 
 # model.add(Lambda(lambda x: ((x/3)-127.5)/127.5, input_shape=(row, col, ch)))
-model.add(Lambda(lambda x: ((x)-127.5)/127.5, input_shape=(row, col, ch)))
+model.add(Lambda(lambda x: ((x)-128)/128, input_shape=(row, col, ch)))
 model.add(Cropping2D(cropping=((60,25), (0,0))))
 
 model.add(Conv2D(24, (5, 5), activation="relu", strides=(2, 2)))
@@ -94,7 +94,7 @@ model.add(Conv2D(64, (3, 3), activation="relu", strides=(2, 2)))
 model.add(Conv2D(64, (3, 3), activation="relu", strides=(2, 2)))
 model.add(Dropout(0.3))
 model.add(Flatten())
-model.add(Dense(125, activation="relu"))
+model.add(Dense(100, activation="relu"))
 model.add(Dropout(0.3))
 model.add(Dense(50,activation="relu"))  
 model.add(Dropout(0.3))
