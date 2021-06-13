@@ -83,14 +83,16 @@ row, col, ch = 160, 320, 3 # Trimmed image format
 
 model = Sequential()
 # Preprocess incoming data, centered around zero with small standard deviation 
-model.add(Lambda(lambda x: (x/127.5) - 1, input_shape=(row, col, ch)))
-model.add(Cropping2D(cropping=((50,20), (0,0))))
-model.add(Convolution2D(24,5,5,border_mode='valid', subsample=(2,2), activation="relu"))
-model.add(Convolution2D(36,5,5,border_mode='valid', subsample=(2,2), activation="relu"))
-model.add(Convolution2D(48,3,3,border_mode='valid', subsample=(2,2), activation="relu"))
-model.add(Convolution2D(64,3,3,border_mode='valid', subsample=(2,2), activation="relu"))
-model.add(Convolution2D(64,3,3,border_mode='valid', subsample=(2,2), activation="relu"))
-model.add(Dropout(0.5))
+# model.add(Lambda(lambda x: ((x/3)-127.5)/127.5, input_shape=(row, col, ch)))
+model.add(Lambda(lambda x: ((x)-127.5)/127.5, input_shape=(row, col, ch)))
+model.add(Cropping2D(cropping=((60,25), (0,0))))
+
+model.add(Conv2D(24, (5, 5), activation="relu", strides=(2, 2)))
+model.add(Conv2D(36, (5, 5), activation="relu", strides=(2, 2)))
+model.add(Conv2D(48, (3, 3), activation="relu", strides=(2, 2)))
+model.add(Conv2D(64, (3, 3), activation="relu", strides=(2, 2)))
+model.add(Conv2D(64, (3, 3), activation="relu", strides=(2, 2)))
+model.add(Dropout(0.3))
 model.add(Flatten())
 model.add(Dense(125, activation="relu"))
 model.add(Dropout(0.3))
@@ -105,7 +107,7 @@ model.compile(loss='mse', optimizer='adam')
 model.fit_generator(train_generator, steps_per_epoch=ceil(len(train_data)/batch_size), \
                     validation_data=validation_generator, \
                     validation_steps=ceil(len(validation_data)/batch_size), \
-                    epochs=20, verbose=1)
+                    epochs=10, verbose=1)
 model.save('model.h5')
-exit()
+
     
