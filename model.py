@@ -126,3 +126,6 @@ model.fit_generator(
     )
 # save the model
 model.save('model.h5')
+
+print("Model saved")
+model.summary()
